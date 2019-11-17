@@ -16,10 +16,12 @@ jobs:
   buildApp:
     name: Build the app
     runs-on: ubuntu-latest
+    steps: 
     - name: go build
       run: go build -o portal ./cmd/vpn-portal/...
   buildContainer:
     name: Build the app
     runs-on: ubuntu-latest
+    steps: 
     - name: podman build 
       run: podman build -f build/package/Dockerfile .
