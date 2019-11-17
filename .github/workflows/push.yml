@@ -1,0 +1,25 @@
+name: Build on Push
+
+on: [push]
+
+jobs:
+  testGoDepVendor:
+    name: Test Go Dep Vendor
+    runs-on: ubuntu-latest
+    steps:
+    -  run: go vet
+  checkFormatting:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps: 
+    - run: go fmt
+  buildApp:
+    name: Build the app
+    runs-on: ubuntu-latest
+    - name: go build
+      run: go build -o portal ./cmd/vpn-portal/...
+  buildContainer:
+    name: Build the app
+    runs-on: ubuntu-latest
+    - name: podman build 
+      run: podman build -f build/package/Dockerfile .
