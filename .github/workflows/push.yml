@@ -24,6 +24,5 @@ jobs:
     using: quay.io/podman/stable
     runs-on: ubuntu-latest
     steps: 
-    - name: podman build 
-      run: podman build -f build/package/Dockerfile .
-      uses: docker://quay.io/podman/stable
+    - name: docker build
+      run: docker build -f build/package/Dockerfile .
