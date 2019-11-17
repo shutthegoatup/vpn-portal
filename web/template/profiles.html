@@ -1,0 +1,68 @@
+{{ define "body" }}
+
+<div class="columns is-multiline">
+{{ range $p := .Profiles }}
+    <div class="column">
+        <div class="card">
+            <header class="card-header">
+                <p class="card-header-title">
+                    {{ .Description }}
+                </p>
+                <span class="card-header-icon" aria-label="more options">
+                    {{ if eq $p.Permitted true }}
+                    <div class="has-background-primary">
+                    {{ else }}
+                    <div class="has-background-danger">
+                    {{ end }}
+                    {{ .Roles }}
+                    </div>
+                </span>
+                <span class="card-header-icon" aria-label="more options">
+                    {{ .Duration }}
+                </span>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <table class="table">
+                        <thead>
+                            <th>Destination</th>
+                            <th>Port</th>
+                            <th>Protocol</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                    {{ range $rule := .Rules }}
+                        <tr>
+                            <td>{{ $rule.Destination }}</td>
+                            <td>{{ $rule.Port }}</td>
+                            <td>{{ $rule.Protocol }}</td>
+                            <td>{{ $rule.Action }}</td>
+                        </tr>
+                    {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <footer class="card-footer">
+                <a href="/profile/{{ .Name }}" class="card-footer-item">
+                    <i class="fa fa-file-text" aria-hidden="true"></i>
+                    View
+                </a>
+                {{ if eq $p.Permitted true }}
+                    <a href="/profile/{{ .Name }}/issue" class="card-footer-item">
+                        <i class="fa fa-download" aria-hidden="true"></i>
+                        Download
+                    </a>
+                {{ else }}
+                    <a href="mailto:allan@secureweb.ltd" class="card-footer-item">
+                        <i class="fa fa-reply" aria-hidden="true"></i>
+                        Request
+                    </a>
+                {{ end }}
+            </footer>
+        </div>
+    </div>
+{{ end }}
+</div>
+
+{{end}}

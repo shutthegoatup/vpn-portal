@@ -1,0 +1,57 @@
+{{ define "body" }}
+<div class="box content">
+    <header class="card-header">
+        <h1 class="card-header-title">
+            {{ .Description }}
+        </h1>
+        <span class="card-header-icon" aria-label="more options">
+            <h2>
+            <div class="has-background-danger">
+            {{ .Roles }}
+            </div>
+          </h2>
+        </span>
+        <span class="card-header-icon" aria-label="more options">
+           <h1>2h</h1>
+        </span>
+    </header>
+  <h2>Firewall Rules</h2>
+  <table class="table is-fullwidth">
+    <thead>
+      <tr>
+        <th>Protocol</th>
+        <th>Destination</th>
+        <th>Port/s</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{ range $rule := .Rules }}
+      <tr>
+        <td>{{ $rule.Protocol }}</td>
+        <td>{{ $rule.Destination }}</td>
+        <td>{{ $rule.Port }}</td>
+        <td>{{ $rule.Action }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+  <h2>Routing</h2>
+  <table class="table is-fullwidth">
+    <thead>
+      <tr>
+        <th>Route</th>
+        <th>Netmask</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{ range $r := .Routes }}
+      <tr>
+        <td>{{ $r.Route }}</td>
+        <td>{{ $r.Netmask }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>
+{{ end }}

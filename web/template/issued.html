@@ -1,0 +1,31 @@
+{{ define "body" }}
+<div class="issued">
+<div>Sessions Issued</div>
+<table class="table is-fullwidth">
+    <thead>
+    <tr>
+        <th>Issues On</th>
+        <th>User</th>
+        <th>Profile</th>
+        <th>Expires</th>
+        <th>Client IP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{ range $i := .Profiles }}
+    <tr>
+        <td>{{ $i.IssuedOn }}</td>
+        <td>
+                {{ $i.User }}
+        </td>
+        <td>
+                {{ $i.Profile }}
+        </td>
+        <td>{{ $i.ExpiresOn }}</td>
+        <td>{{ $i.ClientIP }}</td>
+    </tr>
+    {{ end }}
+    </tbody>
+</table>
+</div>
+{{ end }}

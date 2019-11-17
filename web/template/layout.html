@@ -1,0 +1,48 @@
+<html>
+<head>
+  <title>{{ .Title }}</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.css" 
+  integrity="sha256-ujE/ZUB6CMZmyJSgQjXGCF4sRRneOimQplBVLu8OU5w=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" 
+  integrity="sha256-gsmEoJAws/Kd3CjuOQzLie5Q3yshhvmo7YNtBG7aaEY=" crossorigin="anonymous">
+</head>
+<body>
+  <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <strong>{{ .Brand }}</strong>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="/">Profiles</a>
+        <a class="navbar-item" href="/issued">Sessions</a>
+        <a class="navbar-item" href="{{ .HelpURL }}">Help</a>
+        <div class="navbar-item">{{ .Username }}</div>
+        {{ if .LogoutURL }}
+        <a class="navbar-item" href="{{ .LogoutURL }}">
+          Logout
+        </a>
+        {{ end }}
+      </div>
+    </div>
+  </nav>  
+  <section class="section">
+    <div class=container>
+      {{ template "body" . }}
+    </div>
+  </section>
+  <footer class="footer hero has-background-primary">
+    <div class="hero-foot">
+      <div class="container">
+        <div class="columns">
+          <a href="https://github.com/secureweb/openvpn-sso-portal">
+            openvpn-sso-portal
+          </a>
+        </div>
+      </div>
+    </div>     
+  </footer>
+</body>
+</html>
