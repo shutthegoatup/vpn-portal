@@ -12,7 +12,7 @@ jobs:
       - get: git-repo
         trigger: true
       - set_pipeline: configure-the-pipeline
-        file: build/ci/concourse.yml
+        file: git-repo/build/ci/concourse.yml
       - task: build all 
         config:
           platform: linux
