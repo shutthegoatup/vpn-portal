@@ -10,7 +10,7 @@ jobs:
     plan:
       - get: git-repo
         trigger: true
-      - set_pipeline: configure-the-pipeline
+      - set_pipeline: allan-test
         file: git-repo/build/ci/concourse.yml
       - task: build all 
         config:
