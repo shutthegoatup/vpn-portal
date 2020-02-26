@@ -21,5 +21,6 @@ jobs:
           inputs:
             - name: git-repo
           run:
-            path: go
-            args: ["build", "-o", "portal", "./git-repo/cmd/vpn-portal/..."]
+            path: whoami
+            #path: go
+            #args: ["build", "-o", "portal", "./git-repo/cmd/vpn-portal/..."]
