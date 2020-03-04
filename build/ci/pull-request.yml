@@ -34,7 +34,7 @@ jobs:
         path: pull-request
         status: failure
 
-  - name: go build
+  - name: build
     public: true
     plan:
       - get: pull-request
@@ -62,32 +62,38 @@ jobs:
                 set -e 
                 unset GOPATH
                 go build -o portal ./cmd/vpn-portal/...
-        on_failure:
-          put: pull-request
-          params:
-            path: pull-request
-            status: failure
-
-  - name: container build
-    public: true
-    plan:
-      - get: pull-request
-        trigger: true
-        passed: [go build]
       - task: podman build
         config:
           platform: linux
           image_resource:
             type: docker-image
             source: {repository: quay.io/podman/stable}
-          inputs: 
+          inputs:
             - name: portal
           run:
             dir: pull-request
             path: podman
-            args: ["build"]
+            args: ["build", "-t", "yolo"]
           params:
             STORAGE_DRIVER: vfs
+
+      - task: trivy scan
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: aquasec/trivy}
+          inputs:
+            - name: portal
+          run:
+            dir: pull-request
+            path: trivy
+            args: ["yolo"]
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
 
   - name: go fmt
     public: true
