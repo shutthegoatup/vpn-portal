@@ -75,7 +75,7 @@ jobs:
           run:
             dir: pull-request
             path: podman
-            args: ["build", "-t", "yolo"]
+            args: ["build", "-f", "build/package/Dockerfile", "-t", "yolo"]
           params:
             STORAGE_DRIVER: vfs
 
