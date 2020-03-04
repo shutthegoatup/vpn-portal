@@ -84,13 +84,87 @@ jobs:
             GO111MODULE: "on"
           run:
             dir: pull-request
-            path: /bin/sh
-            args:
-              - -c
-              - |
-                set -e
-                unset GOPATH
-                echo xxxx
+            path: gofmt
+            args: ["-s", "-w", "."]
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+
+  - name: go vet
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        passed: [set-pipeline]
+      - task: go build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: golang}
+          inputs:
+            - name: pull-request
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: pull-request
+            path: go
+            args: ["vet", "."]
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+
+  - name: SCA: License Finder
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        passed: [set-pipeline]
+      in_parallel:
+      - task: License Finder
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: licensefinder/license_finder}
+          inputs:
+            - name: pull-request
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: pull-request
+            path: license_finder
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+
+  - name: SAST
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        passed: [set-pipeline]
+      in_parallel:
+      - task: appthreat/sast-scan
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: appthreat/sast-scan}
+          inputs:
+            - name: pull-request
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: pull-request
+            path: scan
+            args: ["--src", "."]
         on_failure:
           put: pull-request
           params:
