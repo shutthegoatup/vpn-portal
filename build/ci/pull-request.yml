@@ -118,13 +118,12 @@ jobs:
             path: pull-request
             status: failure
 
-  - name: SCA: License Finder
+  - name: SCA - License Finder
     public: true
     plan:
       - get: pull-request
         trigger: true
         passed: [set-pipeline]
-      in_parallel:
       - task: License Finder
         config:
           platform: linux
@@ -150,7 +149,6 @@ jobs:
       - get: pull-request
         trigger: true
         passed: [set-pipeline]
-      in_parallel:
       - task: appthreat/sast-scan
         config:
           platform: linux
