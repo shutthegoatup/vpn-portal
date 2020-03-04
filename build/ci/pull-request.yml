@@ -33,7 +33,6 @@ jobs:
       params:
         path: pull-request
         status: failure
-
   - name: build
     public: true
     plan:
