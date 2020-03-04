@@ -74,13 +74,14 @@ jobs:
       - get: pull-request
         trigger: true
         passed: [go build]
-      - get: portal
       - task: podman build
         config:
           platform: linux
           image_resource:
             type: docker-image
             source: {repository: quay.io/podman/stable}
+          inputs: 
+            - name: portal
           run:
             dir: pull-request
             path: podman
