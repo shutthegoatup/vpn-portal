@@ -208,7 +208,7 @@ jobs:
         trigger: true
         version: every
         passed:
-          - go build
+          - build
           - go fmt
       - put: pull-request
         params:
