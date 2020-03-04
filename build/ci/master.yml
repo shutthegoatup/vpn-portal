@@ -1,0 +1,68 @@
+resources:
+- name: git-repo
+  type: git
+  source:
+    uri: https://github.com/secureweb/vpn-portal
+  webhook_token: foobarbaz
+  check_every: 1m
+
+jobs:
+  - name: set_pipeline
+    public: true
+    plan:
+      - get: git-repo
+        trigger: true
+      - set_pipeline: vpn_portal
+        file: git-repo/build/ci/master.yml
+      - set_pipeline: vpn_portal_pr
+        file: git-repo/build/ci/pull-request.yml
+  - name: go build
+    public: true
+    plan:
+      - get: git-repo
+        trigger: true
+        passed: [set_pipeline]
+      - task: go build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: golang}
+          inputs:
+            - name: git-repo
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: git-repo
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                set -e 
+                unset GOPATH
+                go build -o portal ./cmd/vpn-portal/...
+  - name: go fmt
+    public: true
+    plan:
+      - get: git-repo
+        trigger: true
+        passed: [set_pipeline]
+      - task: go build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: golang}
+          inputs:
+            - name: git-repo
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: git-repo
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                set -e
+                unset GOPATH
+                 
