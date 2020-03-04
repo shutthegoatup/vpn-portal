@@ -49,6 +49,8 @@ jobs:
             source: {repository: golang}
           inputs:
             - name: pull-request
+          outputs:
+            - name: portal
           params:
             GO111MODULE: "on"
           run:
@@ -65,6 +67,26 @@ jobs:
           params:
             path: pull-request
             status: failure
+
+  - name: container build
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        passed: [go build]
+      - get: portal
+      - task: podman build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: quay.io/podman/stable}
+          run:
+            dir: pull-request
+            path: podman
+            args: ["build"]
+          params:
+            STORAGE_DRIVER: vfs
 
   - name: go fmt
     public: true
