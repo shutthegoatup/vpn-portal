@@ -26,6 +26,7 @@ jobs:
         params:
           path: pull-request
           status: pending
+          skip_download: true
       - set_pipeline: vpn-portal-pr
         file: pull-request/build/ci/pull-request.yml
     on_failure:
@@ -33,6 +34,7 @@ jobs:
       params:
         path: pull-request
         status: failure
+        skip_download: true
 
   - name: build
     public: true
@@ -94,6 +96,7 @@ jobs:
           params:
             path: pull-request
             status: failure
+            skip_download: true
 
   - name: go fmt
     public: true
@@ -120,7 +123,7 @@ jobs:
           params:
             path: pull-request
             status: failure
-
+            skip_download: true
   - name: go vet
     public: true
     plan:
@@ -146,7 +149,7 @@ jobs:
           params:
             path: pull-request
             status: failure
-
+            skip_download: true
   - name: SCA - License Finder
     public: true
     plan:
@@ -171,7 +174,7 @@ jobs:
           params:
             path: pull-request
             status: failure
-
+            skip_download: true
   - name: SAST
     public: true
     plan:
@@ -197,7 +200,7 @@ jobs:
           params:
             path: pull-request
             status: failure
-
+            skip_download: true
   - name: Mark Success
     public: true
     plan:
@@ -211,3 +214,4 @@ jobs:
         params:
           path: pull-request
           status: success
+          skip_download: true
