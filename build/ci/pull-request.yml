@@ -11,7 +11,7 @@ resources:
   webhook_token: ((webhook-token))
   source:
     repository: secureweb/vpn-portal
-    access_token: ((github-access-token))
+    access_token: ((access-token))
     disable_forks: true
     base_branch: master
 
