@@ -8,24 +8,38 @@ resources:
 - name: pull-request
   type: pull-request
   check_every: 24h
-  webhook_token: foobarbaz
+  webhook_token: ((webhook-token))
   source:
-    repository: https://github.com/secureweb/vpn-portal
+    repository: secureweb/vpn-portal
+    access_token: ((access-token))
+    disable_forks: true
+    base_branch: master
 
 jobs:
-  - name: set_pipeline
+  - name: set-pipeline
     public: true
     plan:
       - get: pull-request
         trigger: true
-      - set_pipeline: vpn_portal_pr
-        file: git-repo/build/ci/pull-request.yml
-  - name: go build
+        version: every
+      - put: pull-request
+        params:
+          path: pull-request
+          status: pending
+      - set_pipeline: vpn-portal-pr
+        file: pull-request/build/ci/pull-request.yml
+    on_failure:
+      put: pull-request
+      params:
+        path: pull-request
+        status: failure
+  - name: build
     public: true
     plan:
       - get: pull-request
         trigger: true
-        passed: [set_pipeline]
+        version: every
+        passed: [set-pipeline]
       - task: go build
         config:
           platform: linux
@@ -34,10 +48,12 @@ jobs:
             source: {repository: golang}
           inputs:
             - name: pull-request
+          outputs:
+            - name: portal
           params:
             GO111MODULE: "on"
           run:
-            dir: git-repo
+            dir: pull-request
             path: /bin/sh
             args:
               - -c
@@ -45,12 +61,45 @@ jobs:
                 set -e 
                 unset GOPATH
                 go build -o portal ./cmd/vpn-portal/...
+      - task: podman build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: quay.io/podman/stable}
+          inputs:
+            - name: portal
+          run:
+            dir: pull-request
+            path: podman
+            args: ["build", "-f", "build/package/Dockerfile", "-t", "yolo"]
+          params:
+            STORAGE_DRIVER: vfs
+
+      - task: trivy scan
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: aquasec/trivy}
+          inputs:
+            - name: portal
+          run:
+            dir: pull-request
+            path: trivy
+            args: ["yolo"]
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+
   - name: go fmt
     public: true
     plan:
       - get: pull-request
         trigger: true
-        passed: [set_pipeline]
+        passed: [set-pipeline]
       - task: go build
         config:
           platform: linux
@@ -62,11 +111,98 @@ jobs:
           params:
             GO111MODULE: "on"
           run:
-            dir: git-repo
-            path: /bin/sh
-            args:
-              - -c
-              - |
-                set -e
-                unset GOPATH
-                 
+            dir: pull-request
+            path: gofmt
+            args: ["-s", "-w", "."]
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+  - name: go vet
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        passed: [set-pipeline]
+      - task: go build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: golang}
+          inputs:
+            - name: pull-request
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: pull-request
+            path: go
+            args: ["vet", "."]
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+  - name: SCA - License Finder
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        passed: [set-pipeline]
+      - task: License Finder
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: licensefinder/license_finder}
+          inputs:
+            - name: pull-request
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: pull-request
+            path: license_finder
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+  - name: SAST
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        passed: [set-pipeline]
+      - task: appthreat/sast-scan
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: appthreat/sast-scan}
+          inputs:
+            - name: pull-request
+          params:
+            GO111MODULE: "on"
+          run:
+            dir: pull-request
+            path: scan
+            args: ["--src", "."]
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+  - name: Mark Success
+    public: true
+    plan:
+      - get: pull-request
+        trigger: true
+        version: every
+        passed:
+          - build
+          - go fmt
+      - put: pull-request
+        params:
+          path: pull-request
+          status: success
