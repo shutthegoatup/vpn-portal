@@ -7,7 +7,7 @@ resource_types:
 resources:
 - name: pull-request
   type: pull-request
-  check_every: 25h
+  check_every: 24h
   webhook_token: ((webhook-token))
   source:
     repository: secureweb/vpn-portal
