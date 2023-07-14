@@ -1,7 +1,13 @@
 module github.com/secureweb/vpn-portal
 
+go 1.20
+
+require (
+	github.com/gorilla/mux v1.6.2
+	gopkg.in/yaml.v2 v2.2.8
+)
+
 require (
 	github.com/gorilla/context v1.1.1 // indirect
-	github.com/gorilla/mux v1.6.2
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 // indirect
 )
