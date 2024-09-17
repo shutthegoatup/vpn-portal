@@ -3,25 +3,25 @@ resources:
   type: git
   source:
     uri: https://github.com/secureweb/vpn-portal
-  webhook_token: foobarbaz
+  webhook_token: (( webhook-token ))
   check_every: 1m
 
 jobs:
-  - name: set_pipeline
+  - name: set-pipeline
     public: true
     plan:
       - get: git-repo
         trigger: true
-      - set_pipeline: vpn_portal
+      - set_pipeline: vpn-portal
         file: git-repo/build/ci/master.yml
-      - set_pipeline: vpn_portal_pr
+      - set_pipeline: vpn-portal-pr
         file: git-repo/build/ci/pull-request.yml
   - name: go build
     public: true
     plan:
       - get: git-repo
         trigger: true
-        passed: [set_pipeline]
+        passed: [set-pipeline]
       - task: go build
         config:
           platform: linux
@@ -46,7 +46,7 @@ jobs:
     plan:
       - get: git-repo
         trigger: true
-        passed: [set_pipeline]
+        passed: [set-pipeline]
       - task: go build
         config:
           platform: linux
